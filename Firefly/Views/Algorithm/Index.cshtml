@@ -1,0 +1,102 @@
+﻿
+@{
+    ViewBag.Title = "Алгоритм";
+}
+<style>
+    .main-canvas{
+        float:none;
+        padding:20px;
+    }
+    .formuls {
+        padding: 15px;
+        height: 886px;
+    }
+    .formuls p:last-child{
+        color:#ff0000;
+    }
+</style>
+<script>
+    var it = 0;
+
+    $(document).ready(function () {
+
+        var Text = ['1. Инициализируем количество и позицию светлячков(S), ' +
+            ' количество итераций(N), взаимную привлекательность светлячков при нулевом расстоянии(ß<sub>0</sub>), ' +
+            'начальное значение параметра рандомизации(α<sub>0</sub>), коэффициент поглощения света средой(γ) ' +
+            'и счетчик итераций(i)',
+            '2. Находим оптимальную пару для каждого светлячка с помощью ' +
+            'формулы <strong class="formula">ß<sub>i,j</sub> = (ß<sub>0</sub>*f(x)<sub>j</sub>) / (1+γ*r<sub>i,j</sub><sup>2</sup>)</strong>',
+            '3. Если светлячок нашёл пару, он перемещается к своему избраннику.</br> ' +
+            'Если светлячок не нашёл избранника, который привлекательней его, то он перемещается случайным образом.</br>' +
+            'Пермещается светлячок по формуле ' +
+            '<strong class="formula">X<sub>i</sub> = X<sub>j</sub> + ß(r<sub>i,j</sub>)*(X<sub>i</sub> - X<sub>j</sub>)+α</strong>, ' +
+            'где <strong class="formula">ß(r<sub>i,j</sub>)=ß<sub>0</sub>*exp(-γ*r<sub>i,j</sub><sup>n</sup>)</strong>',
+            '4. Если значение счетчика не равно количеству итераций, то переходим к п.2, иначе вычисляем лучшее ' +
+            'решение всеми светлячками в популяции'];
+
+        function Test() {
+
+            $('.op').html('');
+            for (var i = 0; i <= it; i++)
+                $('.op').append('<p>'+Text[i]+'</p>');
+
+            switch (it) {
+                case 0: {
+                    $('.main-canvas').attr('src','/img/Diagram1.jpg');
+                } break;
+                case 1: {
+                    $('.main-canvas').attr('src', '/img/Diagram2.jpg');
+                } break;
+                case 2: {
+                    $('.main-canvas').attr('src', '/img/Diagram3.jpg');
+                } break;
+                case 3: {
+                    $('.main-canvas').attr('src', '/img/Diagram4.jpg');
+                } break;
+            }
+        }
+
+        Test();
+        testButtons();
+
+        function testButtons() {
+            if (it >= Text.length-1)
+                $('.button-next').prop('disabled', true);
+            else
+                $('.button-next').prop('disabled', false);
+
+            if (it <= 0)
+                $('.button-back').prop('disabled', true);
+            else
+                $('.button-back').prop('disabled', false);
+        }
+
+        $('.button-reload').click(function () { it = 0; Test(); testButtons(); });
+
+        $('.button-next').click(function () {
+            it++;
+            Test();
+            testButtons();
+        });
+
+        $('.button-back').click(function () {
+            it--;
+            Test();
+            testButtons();
+        });
+
+    });
+</script>
+<h2>Алгоритм</h2>
+
+<div class="main-job-block">
+    <img class="main-canvas">
+    <div class="formuls">
+        <div class="op"></div>
+        <div class="buttons">
+            <button class="button-reload">Обновить</button>
+            <button class="button-back"><</button>
+            <button class="button-next">></button>
+        </div>
+    </div>
+</div>

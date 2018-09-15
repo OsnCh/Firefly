@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/Scripts/jcanvas.js"></script>
+    <title>@ViewBag.Title</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .main-table {
+            width: 100%;
+            height: 100%;
+        }
+
+            .main-table td:first-child {
+                width: 20%;
+                vertical-align: top;
+                padding-top: 50px;
+            }
+
+                .main-table td:first-child a {
+                    display: block;
+                    text-align: center;
+                }
+
+        h2 {
+            text-align: center;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        .main-job-block {
+            width: 80%;
+            margin: auto;
+            background: #9AB4D8;
+            padding: 20px;
+        }
+
+        .main-canvas {
+            /*width:70%;
+            height:70%;*/
+            float: left;
+            margin-left: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.5);
+        }
+
+        .formula-block {
+            background: #fff;
+            margin: 0 20px;
+            border: 1px solid rgba(0, 0, 0, 0.5);
+        }
+
+            .formula-block p {
+                margin: 0;
+                padding-left: 20px;
+                text-align: left;
+                color: #f52c2c;
+            }
+
+        .description {
+            width: calc(100% - 40px);
+            height: 100px;
+            margin: auto;
+            clear: left;
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.5);
+        }
+
+            .description p {
+                text-align: left;
+                padding: 0 20px;
+                font-weight: 600;
+                color: #d43434;
+                font-style: italic;
+            }
+
+        .formuls {
+            background: #fff;
+            margin: 0 20px;
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            float: right;
+            height: 500px;
+            width: calc(95% - 540px);
+            margin-top: 20px;
+            position: relative;
+        }
+
+            .formuls p {
+                margin: 10px 0;
+                padding-left: 20px;
+                text-align: left;
+                color: #000;
+                text-align: center;
+            }
+
+        .buttons {
+            width: 190px;
+            position: absolute;
+            margin: auto;
+            bottom: 20px;
+            left: calc(50% - 95px);
+        }
+
+            .buttons button {
+                min-width: 40px;
+                height: 40px;
+                padding: 1px 15px;
+            }
+
+        .formula {
+            color: #000;
+            font-style: initial;
+        }
+        .control{
+            width:33%;
+            display:inline-block;
+        }
+            .control p {
+                width: 129px;
+                margin: auto;
+                text-align: center;
+            }
+            .control input {
+                margin: auto;
+                display: block;
+            }
+        .half {
+            width: calc(50% - 2px);
+        }
+        .select-iteration {
+            margin-top: 20px;
+            width: 100%;
+        }
+        .zagl{
+            width:100%;
+            height:100%;
+            position:fixed;
+            top:0;
+            left:0;
+            background: rgba(0, 0, 0, 0.50);
+            display:none;
+        }
+            .zagl p {
+                position: relative;
+                top: 50%;
+                font-size: 20px;
+                font-weight: 600;
+                color: #fff;
+            }
+    </style>
+</head>
+<body>
+    <table class="main-table">
+        <tr>
+            <td>
+                <a href="/Home/Description">Постановка задачи</a>
+                <a href="/ConceptSearch/Index">Идея поиска</a>
+                <a href="/Algorithm/Index">Алгоритм</a>
+                <a href="/Example/Index">Пример</a>
+                <a href="/Test/Index">Тесты</a>
+            </td>
+            <td>
+                @RenderBody()
+            </td>
+        </tr>
+    </table>
+    <div class="zagl">
+        <p>Загрузка...</p>
+    </div>
+</body>
+</html>

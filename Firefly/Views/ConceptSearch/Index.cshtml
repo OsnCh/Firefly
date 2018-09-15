@@ -1,0 +1,42 @@
+﻿
+@{
+    ViewBag.Title = "Идея поиска";
+}
+
+<h2>Идея поиска</h2>
+<script src="~/Scripts/ConceptSearch.js"></script>
+
+<div class="main-job-block">
+    <div class="formula-block">
+        <p><strong class="formula"></strong></p>
+    </div>
+    <canvas class="main-canvas" width="500" height="500"></canvas>
+    <div class="formuls">
+        <p>Переменные:</p>
+        <p class="col-iteration"><strong class="formula">N=40</strong></p>
+        <p class="col-firefly"><strong class="formula">S=25</strong></p>
+        <p class="alpha-first"><strong class="formula">α<sub>0</sub>=</strong></p>
+        <p class="beta-first"><strong class="formula">ß<sub>0</sub>=1</strong></p>
+        <p class="yota-first"><strong class="formula">γ=1</strong></p>
+        <p style="margin-top: 50px;">Формулы:</p>
+        <p class="formula-beta">
+            <strong class="formula">
+                ß<sub>i,j</sub> = (ß<sub>0</sub>*f(x)<sub>j</sub>) / (1+γ*r<sub>i,j</sub><sup>2</sup>)
+            </strong>
+        </p>
+        <p class="formula-X">
+            <strong class="formula">X<sub>i</sub> = X<sub>j</sub> + ß(r<sub>i,j</sub>)*(X<sub>i</sub> - X<sub>j</sub>)+α</strong>
+            <br />
+            <strong class="formula">ß(r<sub>i,j</sub>)=ß<sub>0</sub>*exp(-γ*r<sub>i,j</sub><sup>n</sup>)</strong>
+        </p>
+        <div class="buttons">
+            <button class="button-reload">Обновить</button>
+            <button class="button-back"><</button>
+            <button class="button-next">></button>
+        </div>
+    </div>
+    <div class="description">
+        <p></p>
+    </div>
+</div>
+

@@ -1,0 +1,652 @@
+﻿
+@{
+    ViewBag.Title = "Тесты";
+}
+
+<h2>Тесты</h2>
+
+<style>
+    .description {
+        height: auto;
+    }
+    .description input[type="radio"]{
+        margin-left:20px;
+    }
+        .description button {
+            margin: 20px;
+            max-width: 100%;
+            width: calc(100% - 40px);
+        }
+        .description .answer {
+            text-align: center;
+            margin-bottom: 0;
+        }
+</style>
+
+<script>
+
+    function convertToX(x) {
+        return (x + 10) * 25;
+    }
+
+    function convertToY(y) {
+        return 500 - ((y + 10) * 25);
+    }
+
+    function compareRandom(a, b) {
+        return Math.random() - 0.5;
+    }
+
+    var it = 0;
+
+    var Result;
+
+    function initResult() {
+        Result = [];
+        for (var i = 0; i < 7; i++)
+            Result.push({
+                init: false,
+                answer: false
+            });
+        console.log(Result);
+    }
+
+    initResult();
+
+    $(document).ready(function () {
+
+        function Draw(iteration,data) {
+
+            $('.main-canvas').clearCanvas();
+
+            $('.main-canvas').drawText({
+                fillStyle: '#000',
+                fontStyle: 'italic',
+                fontSize: '10pt',
+                fontFamily: 'Trebuchet MS, sans-serif',
+                text: 'X1',
+                x: convertToX(0) + 20,
+                y: convertToY(10) + 35,
+                align: 'right',
+                maxWidth: 300,
+                lineHeight: -2
+            });
+
+            $('.main-canvas').drawText({
+                fillStyle: '#000',
+                fontStyle: 'italic',
+                fontSize: '10pt',
+                fontFamily: 'Trebuchet MS, sans-serif',
+                text: 'X2',
+                x: convertToX(10) - 35,
+                y: convertToY(0) + 0,
+                align: 'right',
+                maxWidth: 300,
+                lineHeight: -2
+            });
+
+            $('.main-canvas').drawPath({
+                strokeStyle: '#000',
+                strokeWidth: 2,
+                x: 10, y: 10,
+                p1: {
+                    type: 'line',
+                    rounded: true,
+                    endArrow: true,
+                    arrowRadius: 25,
+                    arrowAngle: 90,
+                    x2: 250, y2: 0,
+                    x1: 250, y1: 480
+                },
+                p2: {
+                    type: 'line',
+                    rounded: true,
+                    endArrow: true,
+                    arrowRadius: 25,
+                    arrowAngle: 90,
+                    x1: 0, y1: 250,
+                    x2: 480, y2: 250
+                }
+            });
+
+            if (arguments.length >= 1) {
+
+                switch (iteration) {
+                    case 0: {
+                        $('.main-canvas').drawEllipse({
+                            fillStyle: '#534FC4',
+                            x: convertToX(data[0].X1) + 10,
+                            y: convertToY(data[0].X2) + 10,
+                            width: 4, height: 4
+                        });
+                        $('.main-canvas').drawText({
+                            fillStyle: '#36c',
+                            fontStyle: 'bold',
+                            fontSize: '10pt',
+                            fontFamily: 'Trebuchet MS, sans-serif',
+                            text: data[0].Name + '(' +
+                                parseFloat(data[0].Answer).toFixed(2).toString()+')',
+                            x: convertToX(data[0].X1) + 10,
+                            y: convertToY(data[0].X2) - 10,
+                            align: 'left',
+                            maxWidth: 300,
+                            lineHeight: -2
+                        });
+                        for (var i = 1; i < data.length; i++) {
+                            $('.main-canvas').drawEllipse({
+                                fillStyle: '#c33',
+                                x: convertToX(data[i].X1) + 10,
+                                y: convertToY(data[i].X2) + 10,
+                                width: 4, height: 4
+                            });
+                            $('.main-canvas').drawText({
+                                fillStyle: '#c33',
+                                fontStyle: 'bold',
+                                fontSize: '10pt',
+                                fontFamily: 'Trebuchet MS, sans-serif',
+                                text: data[i].Name + '(' +
+                                    parseFloat(data[i].Answer).toFixed(2).toString() + ')',
+                                x: convertToX(data[i].X1) + 10,
+                                y: convertToY(data[i].X2) - 10,
+                                align: 'left',
+                                maxWidth: 300,
+                                lineHeight: -2
+                            });
+                        }
+                    } break;
+                    case 1: {
+                        for (var i = 0; i < data.length; i++) {
+                            $('.main-canvas').drawEllipse({
+                                fillStyle: '#534FC4',
+                                x: convertToX(data[i].X1) + 10,
+                                y: convertToY(data[i].X2) + 10,
+                                width: 4, height: 4
+                            });
+
+                            $('.main-canvas').drawText({
+                                fillStyle: '#36c',
+                                fontStyle: 'bold',
+                                fontSize: '10pt',
+                                fontFamily: 'Trebuchet MS, sans-serif',
+                                text: parseFloat(data[i].Answer).toFixed(2).toString(),
+                                x: convertToX(data[i].X1) + 10,
+                                y: convertToY(data[i].X2) - 20,
+                                align: 'center',
+                                maxWidth: 300,
+                                lineHeight: -2
+                            });
+                        }
+                    } break;
+                }
+            }
+        }
+
+        function Test() {
+
+            $('.description .des').html('');
+            $('.description .radio-buttons').html('');
+            $('.formula-block').css('display', 'none');
+            Draw();
+            switch (it) {
+                case 0: {
+                    $('.zagl').css('display', 'block');
+                    $.post('/Test/GetDataFirstTest', { Width: 10, Height: 10 },
+                        function (data) {
+                            $('.formula-block').css('display', 'block');
+
+                            var StartData = {
+                                a : getRandomArbitrary(0.1, 3).toFixed(2),
+                                b : getRandomInt(1, 3) * 2,
+                                c : 0,
+                                p : getRandomArbitrary(0.1, 3).toFixed(2),
+                                t : getRandomInt(1, 3) * 2,
+                                g : 0
+                            }
+
+                            var TextFirst = (StartData.c == 0) ?
+                                (StartData.a + '*x<sub>1</sub><sup>' + StartData.b + '</sup>') :
+                                (StartData.a + '*(x<sub>1</sub>+' + StartData.c + ')' + '<sup>' + StartData.b + '</sup>');
+                            var TextTwo = (StartData.g == 0) ?
+                                (StartData.p + '*x<sub>2</sub><sup>' + StartData.t + '</sup>') :
+                                (StartData.p + '*(x<sub>2</sub>+' + StartData.g + ')' + '<sup>' + StartData.t + '</sup>');
+
+                            $('.formula-block strong.formula').html(
+                                'f(x) = ' + TextFirst + ' + ' + TextTwo);
+
+                            console.log(data);
+                            data = JSON.parse(data);
+                            Draw(0, data);
+                            $('.description .des').html('1. Определить к какому светлячку'
+                                + ' полетит светлячок t0, при условии поиска локального минимума');
+                            $('.description .radio-buttons').
+                                html('<input name="first" type="radio" value="0" /> Перемещается случайным образом<br/>');
+                            $('.description .radio-buttons').
+                                append('<input name="first" type="radio" value="5" /> Остаётся на месте<br/>');
+                            for (var i = 1; i < data.length; i++)
+                                $('.description .radio-buttons').append
+                                    ('<input name="first" type="radio" value="'+i+'" /> Перемещается к светлячку t' +
+                                    i + '<br/>');
+                            $('.description .radio-buttons').append('<p class="answer"></p>');
+                            $('.description .radio-buttons').append('<button class="go">Ответить</button>');
+                            $('.description .go').click(function () {
+                                if ($('.description .radio-buttons input:checked').length == 0) return;
+                                if (data.length > $('.description .radio-buttons input:checked').val()
+                                    && data[$('.description .radio-buttons input:checked').val()].Right == true) {
+                                    $('.description .answer').text('Правильно');
+                                    $('.description .answer').css('color', '#609836');
+                                    if (Result[it].init == false)
+                                        Result[it].answer = true;
+                                } else {
+                                    $('.description .answer').text('Неправильно');
+                                    $('.description .answer').css('color', '#d43434');
+                                    if (Result[it].init == false)
+                                        Result[it].answer = false;
+                                }
+                                Result[it].init = true;
+                                testButtons();
+                            });
+                            $('.zagl').css('display', 'none');
+                    });
+                } break;
+                case 1: {
+                    var otvety = [
+                        {
+                            id: 0,
+                            description: 'Перемещается случайным образом',
+                            answer: true
+                        },
+                        {
+                            id: 1,
+                            description: 'Остается на месте',
+                            answer: false
+                        },
+                        {
+                            id: 2,
+                            description: 'Перемещается в сторону лучшего светлячка относительно множества допустимых светлячков',
+                            answer: false
+                        }
+                    ];
+                    var otvetyB = JSON.parse(JSON.stringify(otvety));
+                    otvetyB.sort(compareRandom);
+                    console.log(otvety);
+                    $('.description .des').html('2. Если светлячок не видит возле себя светлячка более яркого, ' +
+                        'чем он сам, то...');
+                    for (var i = 0; i < otvetyB.length; i++)
+                        $('.description .radio-buttons').append
+                            ('<input name="first" type="radio" value="' + otvetyB[i].id + '" />' +
+                            otvetyB[i].description + '<br/>');
+                    $('.description .radio-buttons').append('<p class="answer"></p>');
+                    $('.description .radio-buttons').append('<button class="go">Ответить</button>');
+                    $('.description .go').click(function () {
+                        if ($('.description .radio-buttons input:checked').length == 0) return;
+                        if (otvety.length > $('.description .radio-buttons input:checked').val()
+                            && otvety[$('.description .radio-buttons input:checked').val()].answer == true) {
+                            $('.description .answer').text('Правильно');
+                            $('.description .answer').css('color', '#609836');
+                            if (Result[it].init == false)
+                                Result[it].answer = true;
+                        } else {
+                            $('.description .answer').text('Неправильно');
+                            $('.description .answer').css('color', '#d43434');
+                            if (Result[it].init == false)
+                                Result[it].answer = false;
+                        }
+                        Result[it].init = true;
+                        testButtons();
+                    });
+                } break;
+                case 2: {
+                    var otvety = [
+                        {
+                            id: 0,
+                            description: 'Перемещаются случайным образом',
+                            answer: true
+                        },
+                        {
+                            id: 1,
+                            description: 'Остаются на месте',
+                            answer: false
+                        },
+                        {
+                            id: 2,
+                            description: 'Перемещаются в сторону начала координат',
+                            answer: false
+                        }
+                    ];
+                    var otvetyB = JSON.parse(JSON.stringify(otvety));
+                    otvetyB.sort(compareRandom);
+                    console.log(otvety);
+                    $('.description .des').html('3. В случае γ → ∞ каким образом перемещаются светлячки');
+                    for (var i = 0; i < otvetyB.length; i++)
+                        $('.description .radio-buttons').append
+                            ('<input name="first" type="radio" value="' + otvetyB[i].id + '" />' +
+                            otvetyB[i].description + '<br/>');
+                    $('.description .radio-buttons').append('<p class="answer"></p>');
+                    $('.description .radio-buttons').append('<button class="go">Ответить</button>');
+                    $('.description .go').click(function () {
+                        if ($('.description .radio-buttons input:checked').length == 0) return;
+                        if (otvety.length > $('.description .radio-buttons input:checked').val()
+                            && otvety[$('.description .radio-buttons input:checked').val()].answer == true) {
+                            $('.description .answer').text('Правильно');
+                            $('.description .answer').css('color', '#609836');
+                            if (Result[it].init == false)
+                                Result[it].answer = true;
+                        } else {
+                            $('.description .answer').text('Неправильно');
+                            $('.description .answer').css('color', '#d43434');
+                            if (Result[it].init == false)
+                                Result[it].answer = false;
+                        }
+                        Result[it].init = true;
+                        testButtons();
+                    });
+                } break;
+                case 3: {
+                    var otvety = [
+                        {
+                            id: 0,
+                            description: 'Количество итераций',
+                            answer: true
+                        },
+                        {
+                            id: 1,
+                            description: 'Параметр рандомизации',
+                            answer: false
+                        },
+                        {
+                            id: 2,
+                            description: 'Яркость излучения глобально лучшего светлячка',
+                            answer: false
+                        }
+                    ];
+                    var otvetyB = JSON.parse(JSON.stringify(otvety));
+                    otvetyB.sort(compareRandom);
+                    console.log(otvety);
+                    $('.description .des').html('4. Что является критерием окончания');
+                    for (var i = 0; i < otvetyB.length; i++)
+                        $('.description .radio-buttons').append
+                            ('<input name="first" type="radio" value="' + otvetyB[i].id + '" />' +
+                            otvetyB[i].description + '<br/>');
+                    $('.description .radio-buttons').append('<p class="answer"></p>');
+                    $('.description .radio-buttons').append('<button class="go">Ответить</button>');
+                    $('.description .go').click(function () {
+                        if ($('.description .radio-buttons input:checked').length == 0) return;
+                        if (otvety.length > $('.description .radio-buttons input:checked').val()
+                            && otvety[$('.description .radio-buttons input:checked').val()].answer == true) {
+                            $('.description .answer').text('Правильно');
+                            $('.description .answer').css('color', '#609836');
+                            if (Result[it].init == false)
+                                Result[it].answer = true;
+                        } else {
+                            $('.description .answer').text('Неправильно');
+                            $('.description .answer').css('color', '#d43434');
+                            if (Result[it].init == false)
+                                Result[it].answer = false;
+                        }
+                        Result[it].init = true;
+                        testButtons();
+                    });
+                } break;
+                case 4: {
+
+                    $('.formula-block').css('display', 'block');
+
+                    var StartData = {
+                        a: getRandomArbitrary(0.1, 3).toFixed(2),
+                        b: getRandomInt(1, 3) * 2,
+                        c: 0,
+                        p: getRandomArbitrary(0.1, 3).toFixed(2),
+                        t: getRandomInt(1, 3) * 2,
+                        g: 0
+                    }
+
+                    var TextFirst = (StartData.c == 0) ?
+                        (StartData.a + '*x<sub>1</sub><sup>' + StartData.b + '</sup>') :
+                        (StartData.a + '*(x<sub>1</sub>+' + StartData.c + ')' + '<sup>' + StartData.b + '</sup>');
+                    var TextTwo = (StartData.g == 0) ?
+                        (StartData.p + '*x<sub>2</sub><sup>' + StartData.t + '</sup>') :
+                        (StartData.p + '*(x<sub>2</sub>+' + StartData.g + ')' + '<sup>' + StartData.t + '</sup>');
+
+                    $('.formula-block strong.formula').html(
+                        'f(x) = ' + TextFirst + ' + ' + TextTwo);
+
+                    var point = [];
+                    for (var i = 0; i < 5; i++)
+                        point.push({
+                            X1: (Math.random() * 18).toFixed(2) - 9,
+                            X2: (Math.random() * 18).toFixed(2) - 9,
+                            Answer: (Math.random() * 10).toFixed(2) - 5
+                        });
+                    Draw(1, point);
+                    point.sort(function (a, b) {
+                        if (a.Answer < b.Answer)
+                            return -1;
+                        if (a.Answer > b.Answer)
+                            return 1;
+                        return 0;
+                    });
+                    console.log(point);
+
+                    var otvety = [];
+                    for (var i = 0; i < point.length; i++)
+                        otvety.push({
+                            id: i,
+                            description: point[i].Answer.toFixed(2),
+                            answer: (i==0)?true:false
+                        });
+                    var otvetyB = JSON.parse(JSON.stringify(otvety));
+                    otvetyB.sort(compareRandom);
+                    console.log(otvety);
+                    $('.description .des').html('5. Какое решение задачи нахождения локальных минимумумов, при условии, что данные отображены во время окончания всех итераций');
+                    for (var i = 0; i < otvetyB.length; i++)
+                        $('.description .radio-buttons').append
+                            ('<input name="first" type="radio" value="' + otvetyB[i].id + '" />' +
+                            otvetyB[i].description + '<br/>');
+                    $('.description .radio-buttons').append('<p class="answer"></p>');
+                    $('.description .radio-buttons').append('<button class="go">Ответить</button>');
+                    $('.description .go').click(function () {
+                        if ($('.description .radio-buttons input:checked').length == 0) return;
+                        if (otvety.length > $('.description .radio-buttons input:checked').val()
+                            && otvety[$('.description .radio-buttons input:checked').val()].answer == true) {
+                            $('.description .answer').text('Правильно');
+                            $('.description .answer').css('color', '#609836');
+                            if (Result[it].init == false)
+                                Result[it].answer = true;
+                        } else {
+                            $('.description .answer').text('Неправильно');
+                            $('.description .answer').css('color', '#d43434');
+                            if (Result[it].init == false)
+                                Result[it].answer = false;
+                        }
+                        Result[it].init = true;
+                        testButtons();
+                    });
+                } break;
+                case 5: {
+                    var otvety = [
+                        {
+                            id: 0,
+                            description: 'Менее привлекательные светлячки перемещаются в направлении более привлекательного светлячка.',
+                            answer: true
+                        },
+                        {
+                            id: 1,
+                            description: 'Более привлекательные светлячки перемещаются в направлении менее привлекательного светлячка.',
+                            answer: false
+                        },
+                        {
+                            id: 2,
+                            description: 'Все светлячки летят к друг другу, вне зависимости от их привлекательности',
+                            answer: false
+                        }
+
+                    ];
+                    var otvetyB = JSON.parse(JSON.stringify(otvety));
+                    otvetyB.sort(compareRandom);
+                    console.log(otvety);
+                    $('.description .des').html('6. Выберите правильное утверждение');
+                    for (var i = 0; i < otvetyB.length; i++)
+                        $('.description .radio-buttons').append
+                            ('<input name="first" type="radio" value="' + otvetyB[i].id + '" />' +
+                            otvetyB[i].description + '<br/>');
+                    $('.description .radio-buttons').append('<p class="answer"></p>');
+                    $('.description .radio-buttons').append('<button class="go">Ответить</button>');
+                    $('.description .go').click(function () {
+                        if ($('.description .radio-buttons input:checked').length == 0) return;
+                        if (otvety.length > $('.description .radio-buttons input:checked').val()
+                            && otvety[$('.description .radio-buttons input:checked').val()].answer == true) {
+                            $('.description .answer').text('Правильно');
+                            $('.description .answer').css('color', '#609836');
+                            if (Result[it].init == false)
+                                Result[it].answer = true;
+                        } else {
+                            $('.description .answer').text('Неправильно');
+                            $('.description .answer').css('color', '#d43434');
+                            if (Result[it].init == false)
+                                Result[it].answer = false;
+                        }
+                        Result[it].init = true;
+                        testButtons();
+                    });
+                } break;
+                case 6: {
+                    var otvety = [
+                        {
+                            id: 0,
+                            description: 'X<sub>i</sub>',
+                            answer: false
+                        },
+                        {
+                            id: 1,
+                            description: 'ß<sub>ij</sub>',
+                            answer: false
+                        },
+                        {
+                            id: 2,
+                            description: 'γ',
+                            answer: true
+                        },
+                        {
+                            id: 3,
+                            description: 'α',
+                            answer: true
+                        }
+                    ];
+                    var otvetyB = JSON.parse(JSON.stringify(otvety));
+                    otvetyB.sort(compareRandom);
+                    console.log(otvety);
+                    $('.description .des').html('7. Какой из параметров является свободным параметром алгоритма');
+                    for (var i = 0; i < otvetyB.length; i++)
+                        $('.description .radio-buttons').append
+                            ('<input name="first" type="radio" value="' + otvetyB[i].id + '" />' +
+                            otvetyB[i].description + '<br/>');
+                    $('.description .radio-buttons').append('<p class="answer"></p>');
+                    $('.description .radio-buttons').append('<button class="go">Ответить</button>');
+                    $('.description .go').click(function () {
+                        if ($('.description .radio-buttons input:checked').length == 0) return;
+                        if (otvety.length > $('.description .radio-buttons input:checked').val()
+                            && otvety[$('.description .radio-buttons input:checked').val()].answer == true) {
+                            $('.description .answer').text('Правильно');
+                            $('.description .answer').css('color', '#609836');
+                            if (Result[it].init == false)
+                                Result[it].answer = true;
+                        } else {
+                            $('.description .answer').text('Неправильно');
+                            $('.description .answer').css('color', '#d43434');
+                            if (Result[it].init == false)
+                                Result[it].answer = false;
+                        }
+                        Result[it].init = true;
+                        testButtons();
+                        var r = 0;
+                        for (var i = 0; i < Result.length; i++)
+                            if (Result[i].answer == true)
+                                r++;
+                        $('.result').html('Ваш результат ' + r + '/' + Result.length + '<br />' + (r / Result.length * 100).toFixed(2) + '%');
+                    });
+                } break;
+            }
+            testButtons();
+        }
+
+
+        function testButtons() {
+            if (it >= 6 || Result[it].init == false)
+                $('.button-next').prop('disabled', true);
+            else
+                $('.button-next').prop('disabled', false);
+
+            if (it <= 0)
+                $('.button-back').prop('disabled', true);
+            else
+                $('.button-back').prop('disabled', false);
+        }
+
+        function getRandomArbitrary(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+        Test();
+
+        $('.button-reload').click(function () {
+            it = 0;
+            Test();
+            testButtons();
+            initResult();
+            $('.result').html('');
+        });
+
+        $('.button-next').click(function () {
+            it++;
+            Test();
+            testButtons();
+        });
+
+        $('.button-back').click(function () {
+            it--;
+            Test();
+            testButtons();
+        });
+
+    });
+
+
+</script>
+
+<div class="main-job-block">
+    <div style="display:none;" class="formula-block">
+        <p><strong class="formula"></strong></p>
+    </div>
+    <canvas class="main-canvas" width="500" height="500"></canvas>
+    <div class="formuls">
+        <p>Формулы:</p>
+        <p class="formula-beta">
+            <strong class="formula">
+                ß<sub>i,j</sub> = (ß<sub>0</sub>*f(x)<sub>j</sub>) / (1+γ*r<sub>i,j</sub><sup>2</sup>)
+            </strong>
+        </p>
+        <p class="formula-X">
+            <strong class="formula">X<sub>i</sub> = X<sub>j</sub> + ß(r<sub>i,j</sub>)*(X<sub>i</sub> - X<sub>j</sub>)+α</strong>
+            <br />
+            <strong class="formula">ß(r<sub>i,j</sub>)=ß<sub>0</sub>*exp(-γ*r<sub>i,j</sub><sup>n</sup>)</strong>
+        </p>
+        <div class="buttons">
+            <p class="result" style="padding-left:0;"></p>
+            <div class="buttons-control">
+                <button class="button-reload">Обновить</button>
+                <button class="button-back"><</button>
+                <button class="button-next">></button>
+            </div>
+        </div>
+    </div>
+    <div class="description">
+        <p class="des"></p>
+        <div class="radio-buttons">
+
+        </div>
+    </div>
+</div>
+

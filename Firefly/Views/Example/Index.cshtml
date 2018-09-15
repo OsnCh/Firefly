@@ -1,0 +1,494 @@
+﻿
+@{
+    ViewBag.Title = "Пример";
+}
+
+<h2>Пример</h2>
+
+<style>
+    .description{
+        height:auto;
+    }
+</style>
+
+<script>
+    var StartData;
+    var DataResponse;
+
+    var it = 0;
+
+    function getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    function convertToX(x) {
+        return (x + 10) * 25;
+    }
+
+    function convertToY(y) {
+        return 500 - ((y + 10) * 25);
+    }
+
+    function parseData() {
+        var data = StartData;
+        data.a = parseFloat(data.a);
+        data.c = parseFloat(data.c);
+        data.b = parseFloat(data.b);
+        data.p = parseFloat(data.p);
+        data.t = parseFloat(data.t);
+        data.g = parseFloat(data.g);
+
+        data.a0 = parseFloat(data.a0);
+        data.b0 = parseFloat(data.b0);
+        data.yota = parseFloat(data.yota);
+
+        return data;
+    }
+
+    $(document).ready(function () {
+
+        function startGeneration() {
+            var a = getRandomArbitrary(0.1, 3).toFixed(2),
+                b = getRandomInt(1, 3)*2,
+                c = getRandomArbitrary(-3, 3).toFixed(2),
+                p = getRandomArbitrary(0.1, 3).toFixed(2),
+                t = getRandomInt(2, 5),
+                g = getRandomArbitrary(-3, 3).toFixed(2);
+            var Width = 10, Height = 10;
+            var a0 = Math.random().toFixed(1), b0 = 1, yota = 1;
+            var N = 40; S = 25;
+
+            StartData = {
+                'a': a,
+                'b': b,
+                'c': c,
+                'p': p,
+                't': t,
+                'g': g,
+                'Width': Width,
+                'Height': Height,
+                'a0': a0,
+                'b0': b0,
+                'yota': yota,
+                'N': N,
+                'S': S
+            };
+
+            $('.control-a').val(a * 100);
+            $('.control-b').val(b);
+            $('.control-c').val(c * 100);
+            $('.control-p').val(p * 100);
+            $('.control-t').val(t);
+            $('.control-g').val(g * 100);
+
+            $('.control-a0').val(a0 * 10);
+            $('.control-b0').val(b0*100);
+            $('.control-yota').val(yota * 100);
+
+            $('.control-N').val(N);
+            $('.control-S').val(Math.sqrt(S));
+
+            ChangeGeneration();
+
+        }
+
+        function ChangeGeneration() {
+            $('.col-iteration .formula').text('N=' + StartData.N);
+            $('.col-firefly .formula').text('S=' + StartData.S);
+            $('.alpha-first .formula').html('α<sub>0</sub>=' + StartData.a0);
+            $('.beta-first .formula').html('ß<sub>0</sub>=' + StartData.b0);
+            $('.yota-first .formula').text('γ=' + StartData.yota);
+            var TextFirst = (StartData.c == 0) ?
+                (StartData.a + '*x<sub>1</sub><sup>' + StartData.b + '</sup>') :
+                (StartData.a + '*(x<sub>1</sub>+' + StartData.c + ')' + '<sup>' + StartData.b + '</sup>');
+            var TextTwo = (StartData.g == 0) ?
+                (StartData.p + '*x<sub>2</sub><sup>' + StartData.t + '</sup>') :
+                (StartData.p + '*(x<sub>2</sub>+' + StartData.g + ')' + '<sup>' + StartData.t + '</sup>');
+
+            $('.formula-block strong.formula').html(
+                'f(x) = ' + TextFirst + ' + ' + TextTwo);
+        }
+
+        function Draw(iteration) {
+
+            $('.main-canvas').clearCanvas();
+
+            $('.main-canvas').drawText({
+                fillStyle: '#000',
+                fontStyle: 'italic',
+                fontSize: '10pt',
+                fontFamily: 'Trebuchet MS, sans-serif',
+                text: 'X1',
+                x: convertToX(0) + 20,
+                y: convertToY(10) + 35,
+                align: 'right',
+                maxWidth: 300,
+                lineHeight: -2
+            });
+
+            $('.main-canvas').drawText({
+                fillStyle: '#000',
+                fontStyle: 'italic',
+                fontSize: '10pt',
+                fontFamily: 'Trebuchet MS, sans-serif',
+                text: 'X2',
+                x: convertToX(10) - 35,
+                y: convertToY(0) + 0,
+                align: 'right',
+                maxWidth: 300,
+                lineHeight: -2
+            });
+
+            $('.main-canvas').drawPath({
+                strokeStyle: '#000',
+                strokeWidth: 2,
+                x: 10, y: 10,
+                p1: {
+                    type: 'line',
+                    rounded: true,
+                    endArrow: true,
+                    arrowRadius: 25,
+                    arrowAngle: 90,
+                    x2: 250, y2: 0,
+                    x1: 250, y1: 480
+                },
+                p2: {
+                    type: 'line',
+                    rounded: true,
+                    endArrow: true,
+                    arrowRadius: 25,
+                    arrowAngle: 90,
+                    x1: 0, y1: 250,
+                    x2: 480, y2: 250
+                }
+            });
+
+            for (var i = 0; i <= 40; i += 5) {
+                var mass = GetLevel(i);
+                var obj = {
+                    strokeStyle: '#000',
+                    strokeWidth: 1
+                }
+                for (var j = 0; j < mass.length; j++) {
+                    obj['x' + (j + 1)] = convertToX(mass[j].x);
+                    obj['y' + (j + 1)] = convertToY(mass[j].y);
+                }
+
+                obj['x' + (mass.length)] = obj['x' + 1];
+                obj['y' + (mass.length)] = obj['y' + 1];
+
+                $('.main-canvas').drawLine(obj);
+            }
+
+            $('.formuls p .formula').css('color', '#000');
+
+                if (arguments.length == 1) {
+                    switch (parseInt(iteration)) {
+                        case 0: {
+                            for (var j = 0; j < DataResponse.startGeneration.length; j++)
+                                $('.main-canvas').drawEllipse({
+                                    fillStyle: '#c33',
+                                    x: convertToX(DataResponse.startGeneration[j].X1) + 10,
+                                    y: convertToY(DataResponse.startGeneration[j].X2) + 10,
+                                    width: 4, height: 4
+                                });
+                            $('.description .des').html('Инициализируем начальную популяцию светлячков');
+                        } break;
+                        case DataResponse.listGeneration.length: {
+
+                            for (var i = 0; i < DataResponse.listGeneration[0].length; i++) {
+                                var obj = {
+                                    strokeStyle: '#FAA4A6',
+                                    strokeWidth: 0.8
+                                }
+                                for (var j = 0; j < DataResponse.listGeneration.length; j++) {
+                                    obj['x' + (j + 1)] = convertToX(DataResponse.listGeneration[j][i].X1) + 10;
+                                    obj['y' + (j + 1)] = convertToY(DataResponse.listGeneration[j][i].X2) + 10;
+                                }
+                                $('.main-canvas').drawLine(obj);
+                            }
+
+                            for (var i = 0; i < DataResponse.listGeneration[DataResponse.listGeneration.length - 1].length; i++)
+                                $('.main-canvas').drawEllipse({
+                                    fillStyle: '#c33',
+                                    x: convertToX(DataResponse.listGeneration[DataResponse.listGeneration.length - 1][i].X1) + 10,
+                                    y: convertToY(DataResponse.listGeneration[DataResponse.listGeneration.length - 1][i].X2) + 10,
+                                    width: 4, height: 4
+                                });
+
+                            $('.main-canvas').drawEllipse({
+                                fillStyle: '#534FC4',
+                                x: convertToX(DataResponse.Answer.X1) + 10,
+                                y: convertToY(DataResponse.Answer.X2) + 10,
+                                width: 4, height: 4
+                            });
+
+                            $('.main-canvas').drawText({
+                                fillStyle: '#36c',
+                                fontStyle: 'bold',
+                                fontSize: '10pt',
+                                fontFamily: 'Trebuchet MS, sans-serif',
+                                text: parseFloat(DataResponse.Answer.Answer).toFixed(2).toString() +
+                                    '\n(' + parseFloat(DataResponse.Answer.X1).toFixed(2).toString() + ','
+                                    + parseFloat(DataResponse.Answer.X2).toFixed(2).toString() + ')',
+                                x: convertToX(DataResponse.Answer.X1) + 10,
+                                y: convertToY(DataResponse.Answer.X2) - 20,
+                                align: 'center',
+                                maxWidth: 300,
+                                lineHeight: -2
+                            });
+
+                            $('.description .des').html('Останавливаем процесс перемещения светлячков ' +
+                                'и определяем найлучшего.');
+
+                            $('.formuls .col-iteration .formula').css('color', '#d43434');
+
+                        } break;
+                        default: {
+                            for (var i = 0; i < DataResponse.listGeneration[0].length; i++) {
+                                var obj = {
+                                    strokeStyle: '#FAA4A6',
+                                    strokeWidth: 0.8
+                                }
+                                for (var j = 0; j < parseInt(iteration)+1; j++) {
+                                    obj['x' + (j + 1)] = convertToX(DataResponse.listGeneration[j][i].X1) + 10;
+                                    obj['y' + (j + 1)] = convertToY(DataResponse.listGeneration[j][i].X2) + 10;
+                                }
+                                $('.main-canvas').drawLine(obj);
+                            }
+
+                            for (var i = 0; i < DataResponse.listGeneration[iteration].length; i++)
+                                $('.main-canvas').drawEllipse({
+                                    fillStyle: '#c33',
+                                    x: convertToX(DataResponse.listGeneration[iteration][i].X1) + 10,
+                                    y: convertToY(DataResponse.listGeneration[iteration][i].X2) + 10,
+                                    width: 4, height: 4
+                                });
+
+                            $('.description .des').html(' По формуле <strong class="formula"> ß<sub>i, j</sub> = (ß<sub>0</sub>*f(x)<sub>j</sub>)/(1 + γ*r<sub>i,j</sub><sup>2</sup>)</strong>'
+                                + ' находим самую привлекательную пару для каждого светлячка.<br />Если светлячок нашёл пару, он перемещается к своему избраннику.</br> ' +
+                                'Если светлячок не нашёл избранника, который привлекательней его, то он перемещается случайным образом.</br>' +
+                                'Пермещается светлячок по формуле ' +
+                                '<strong class="formula">X<sub>i</sub> = X<sub>j</sub> + ß(r<sub>i,j</sub>)*(X<sub>i</sub> - X<sub>j</sub>)+α</strong>, ' +
+                                'где <strong class="formula">ß(r<sub>i,j</sub>)=ß<sub>0</sub>*exp(-γ*r<sub>i,j</sub><sup>n</sup>)</strong>');
+                            $('.formuls .formula-beta .formula').css('color', '#d43434');
+                            $('.formuls .formula-X .formula').css('color', '#d43434');
+                        } break;
+                    }
+                } 
+        }
+
+        function GetLevel(z) {
+
+            var mass = [];
+
+            var data = parseData();
+
+            for (var i = -10; i <= 10; i += 0.01) {
+                var buf = Math.pow((z - data.a * Math.pow(i + data.c, data.b) / data.p),
+                    (1 / data.t)) - data.g;
+                if (!isNaN(buf)) {
+                    mass.push({ x: i, y: buf });
+                }
+            }
+
+            for (var i = 10; i >= -10; i -= 0.01) {
+                var buf = (-1) * Math.pow((z - data.a * Math.pow(i + data.c, data.b) / data.p),
+                    (1 / data.t)) - data.g;
+                if (!isNaN(buf)) {
+                    mass.push({ x: i, y: buf });
+                }
+            }
+
+            return mass;
+        }
+
+
+        function testButtons() {
+            if (it >= DataResponse.listGeneration.length)
+                $('.button-next').prop('disabled', true);
+            else
+                $('.button-next').prop('disabled', false);
+
+            if (it <= 0)
+                $('.button-back').prop('disabled', true);
+            else
+                $('.button-back').prop('disabled', false);
+        }
+
+        $('.button-next').click(function () {
+            it++;
+            $('.select-iteration').val(it);
+            $('.select-iteration').change();
+        });
+
+        $('.button-back').click(function () {
+            it--;
+            $('.select-iteration').val(it);
+            $('.select-iteration').change();
+        });
+
+        $('.button-reload').click(function () {
+            it = 0;
+            startGeneration();
+            Draw();
+            $('.buttons-control').css('display', 'none');
+            $('.button-start').css('display', 'block');
+            $('.description .control').css('display', 'inline-block');
+            $('.description .des').html('');
+            $('.select-iteration').val(0);
+            $('.select-iteration').html('');
+            testButtons();
+        });
+
+        startGeneration();
+        Draw();
+
+        $('input[type="range"]').change(function () {
+            StartData.a=$('.control-a').val()/100;
+            StartData.b=$('.control-b').val();
+            StartData.c=$('.control-c').val()/100;
+            StartData.p=$('.control-p').val()/100;
+            StartData.t=$('.control-t').val();
+            StartData.g=$('.control-g').val()/100;
+
+            StartData.a0=$('.control-a0').val()/10;
+            StartData.b0=$('.control-b0').val()/10;
+            StartData.yota=$('.control-yota').val()/10;
+
+            StartData.N = $('.control-N').val();
+            StartData.S = Math.pow($('.control-S').val(),2);
+
+            ChangeGeneration();
+            Draw();
+        });
+
+        $('.button-start').click(function () {
+            it = 0;
+            $('.button-start').css('display', 'none');
+            $('.buttons-control').css('display', 'block');
+            var dataR = JSON.stringify(StartData);
+            $('.zagl').css('display', 'block');
+            $.post('/ConceptSearch/GetData', { startModel: dataR }
+                , function (data) {
+                    it = 0;
+                    $('.description .control').css('display', 'none');
+                    console.log(data);
+                    DataResponse = JSON.parse(data);
+
+                    $('.select-iteration').
+                        append('<option value="0">Начальная популяция</option>');
+
+                    for (var i = 1; i < DataResponse.listGeneration.length; i++)
+                        $('.select-iteration').
+                            append('<option value="'+i+'">Итерация №'+i+'</option>');
+
+                    $('.select-iteration').
+                        append('<option value="' +
+                            DataResponse.listGeneration.length + '">Ответ</option>');
+
+                    Draw(it);
+                    $('.zagl').css('display', 'none');
+                });
+        });
+
+        $('.select-iteration').change(function () {
+            it = $('.select-iteration').val();
+            Draw(it);
+            testButtons();
+        });
+
+    });
+</script>
+
+<div class="main-job-block">
+    <div class="formula-block">
+        <p><strong class="formula"></strong></p>
+    </div>
+    <canvas class="main-canvas" width="500" height="500"></canvas>
+    <div class="formuls">
+        <p>Переменные:</p>
+        <p class="col-iteration"><strong class="formula">N=40</strong></p>
+        <p class="col-firefly"><strong class="formula">S=25</strong></p>
+        <p class="alpha-first"><strong class="formula">α<sub>0</sub>=</strong></p>
+        <p class="beta-first"><strong class="formula">ß<sub>0</sub>=1</strong></p>
+        <p class="yota-first"><strong class="formula">γ=1</strong></p>
+        <p style="margin-top: 50px;">Формулы:</p>
+        <p class="formula-beta">
+            <strong class="formula">
+                ß<sub>i,j</sub> = (ß<sub>0</sub>*f(x)<sub>j</sub>) / (1+γ*r<sub>i,j</sub><sup>2</sup>)
+            </strong>
+        </p>
+        <p class="formula-X">
+            <strong class="formula">X<sub>i</sub> = X<sub>j</sub> + ß(r<sub>i,j</sub>)*(X<sub>i</sub> - X<sub>j</sub>)+α</strong>
+            <br />
+            <strong class="formula">ß(r<sub>i,j</sub>)=ß<sub>0</sub>*exp(-γ*r<sub>i,j</sub><sup>n</sup>)</strong>
+        </p>
+        <div class="buttons">
+            <div class="buttons-control" style="display:none;">
+                <button class="button-reload">Обновить</button>
+                <button class="button-back"><</button>
+                <button class="button-next">></button>
+                <select class="select-iteration"></select>
+            </div>
+            <button class="button-start" style="margin:auto;display:block;">Начать</button>
+        </div>
+    </div>
+    <div class="description">
+        <div class="control">
+            <p>a</p>
+            <input class="control-a" type="range" min="1" max="300">
+        </div>
+        <div class="control">
+            <p>b</p>
+            <input class="control-b" type="range" min="2" max="6" step="2">
+        </div>
+        <div class="control">
+            <p>c</p>
+            <input class="control-c" type="range" min="-300" max="300">
+        </div>
+
+        <div class="control">
+            <p>p</p>
+            <input class="control-p" type="range" min="1" max="300">
+        </div>
+        <div class="control">
+            <p>t</p>
+            <input class="control-t" type="range" min="2" max="5">
+        </div>
+        <div class="control">
+            <p>g</p>
+            <input class="control-g" type="range" min="-300" max="300">
+        </div>
+
+        <div class="control">
+            <p>α</p>
+            <input class="control-a0" type="range" min="0" max="10">
+        </div>
+        <div class="control">
+            <p>ß</p>
+            <input class="control-b0" type="range" min="1" max="10">
+        </div>
+        <div class="control">
+            <p>γ</p>
+            <input class="control-yota" type="range" min="1" max="10">
+        </div>
+
+        <div class="control half">
+            <p>N</p>
+            <input class="control-N" type="range" min="1" max="100">
+        </div>
+        <div class="control half">
+            <p>S</p>
+            <input class="control-S" type="range" min="1" max="10">
+        </div>
+
+        <p class="des"></p>
+    </div>
+    </div>
+
+
